@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-#if true
+#if UNITY_ANDROID
 using Unity.Notifications.Android;
 #endif
 
