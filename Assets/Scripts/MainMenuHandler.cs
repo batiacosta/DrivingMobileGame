@@ -11,6 +11,7 @@ public class MainMenuHandler : MonoBehaviour
     [SerializeField] private TextMeshProUGUI playButtonText;
     [SerializeField] private int maxEnergy;
     [SerializeField] private int energyRechargeDurationMinutes;
+    [SerializeField] private AndroidNotificationsHandler androidNotificationsHandler;
 
     private int _energy;
     private const string EnergyKey = "Energy";
@@ -68,6 +69,10 @@ public class MainMenuHandler : MonoBehaviour
         {
             DateTime oneMinuteFromNow = DateTime.Now.AddMinutes(energyRechargeDurationMinutes);
             PlayerPrefs.SetString(EnergyReadyKey, oneMinuteFromNow.ToString());
+            #if UNITY_ANDROID
+                androidNotificationsHandler.ScheduleNotification(oneMinuteFromNow);
+            #endif
+            
         }
         SceneManager.LoadScene("Level1");
 
