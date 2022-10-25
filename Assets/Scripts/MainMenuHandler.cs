@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MainMenuHandler : MonoBehaviour
 {
@@ -13,14 +14,23 @@ public class MainMenuHandler : MonoBehaviour
     [SerializeField] private int energyRechargeDurationMinutes;
     [SerializeField] private AndroidNotificationsHandler androidNotificationsHandler;
     [SerializeField] private iOSNotificationHandler iOSNotificationsHandler;
+    [SerializeField] private Button playButton;
 
-    private int _energy;
+    private int _energy = 0;
     private const string EnergyKey = "Energy";
     private const string EnergyReadyKey = "EnergyReady";
     private int lastScore;
 
     private void Start()
     {
+        OnAplicationFocus(true);
+    }
+
+    private void OnAplicationFocus(bool hasFocus)
+    {
+        if(!hasFocus) return;
+        CancelInvoke();
+        
         lastScore = PlayerPrefs.GetInt(ScoreHandler.HighScoreKey, 0);
         highScoreText.text = $"The highest score is:\n{lastScore}";
 
@@ -33,10 +43,15 @@ public class MainMenuHandler : MonoBehaviour
             {
                 RechargeEnergy();
             }
+            else
+            {
+                playButton.interactable = false;
+                Invoke(nameof(RechargeEnergy), (dateEnergyIsRecharged - DateTime.Now).Seconds);
+            }
         }
-
-        playButtonText.text = $"Play ({_energy})";
+        UpdatePlayButtoText();
     }
+    
 
     private static DateTime GetWhenEnergyIsRecharged()
     {
@@ -50,8 +65,15 @@ public class MainMenuHandler : MonoBehaviour
 
     private void RechargeEnergy()
     {
-        _energy = maxEnergy; //  Refill energy
+        _energy = maxEnergy;
         PlayerPrefs.SetInt(EnergyKey, _energy);
+        playButton.interactable = true;
+        UpdatePlayButtoText();
+    }
+
+    private void UpdatePlayButtoText()
+    {
+        playButtonText.text = $"Play ({_energy})";
     }
 
     private void CheckEnergy()
